@@ -8,23 +8,30 @@ import org.apache.log4j.Logger
 import java.io.FileInputStream
 
 class SftpClient {
-  @transient
-  lazy val log: Logger = Logger.getLogger(getClass.getName)
+//  @transient
+//  lazy val log: Logger = Logger.getLogger(getClass.getName)
   
-  def setupConnection(username: String, host: String, port: String): ChannelSftp = {
+  def setupConnection(username: String, password: String, host: String, port: String): ChannelSftp = {
     val jsch = new JSch()
     var sftp = new ChannelSftp()
-    val jschSession = jsch.getSession(username,host, port.asInstanceOf[Int])
+    val jschSession = jsch.getSession(username,host, port.toInt)
+    jschSession.setPassword(password)
     val config = new java.util.Properties()
     config.put("StrictHostKeyChecking", "no")
     jschSession.setConfig(config)
-    jschSession.connect()
-    if(jschSession.isConnected()){
-      sftp = (jschSession.openChannel("sftp")).asInstanceOf[ChannelSftp]
-      sftp.connect()
-      log.info("Conexão exitosa")
-    } else {
-     throw new Exception(s"Erro ao tentar conectar no SFTP") 
+    try{
+      jschSession.connect()
+      if(jschSession.isConnected()){
+        sftp = (jschSession.openChannel("sftp")).asInstanceOf[ChannelSftp]
+        sftp.connect()
+//        log.info("Conexão exitosa")
+      } else {
+       throw new Exception(s"Erro ao tentar conectar no SFTP") 
+//       log.error("Nao e possivel connector ao servidor SFTP")
+      }
+    } catch{
+      case e: Throwable => e.printStackTrace()
+//      log.error("Erro ao tentar conectar no SFTP: " + e.getMessage)
     }
     return sftp
   }
@@ -32,41 +39,39 @@ class SftpClient {
   def listarArquivos(sftp:ChannelSftp, path:String){
     try{
       if(sftp.isConnected()){
-    	  val files:Vector[ChannelSftp#LsEntry] = sftp.ls(path).asInstanceOf
+    	  val files = sftp.ls(path)
 			  var dir = new ArrayList[String]
-			  for(f <- files){
-				  if(!f.getAttrs.isDir()){
-					  dir.add(path+"/"+f.getFilename) // guardo los archivos finales
-				  } else if(f.getAttrs.isDir()){
-					  listarArquivos(sftp, path+"/"+f.getFilename)
-			    }
-		    }  
+    	  files.forEach(c=>
+  	      if(!c.toString().endsWith(".") && !c.toString().endsWith("..")){
+    	      var entry: ChannelSftp#LsEntry = c.asInstanceOf[ChannelSftp#LsEntry]
+    	      if(!entry.getAttrs.isDir()){
+    	        dir.add(path+entry.getFilename)
+    	      } else if(entry.getAttrs.isDir()){
+    	        listarArquivos(sftp,path+entry.getFilename+"/")
+  	        }
+  	      } 
+    	  )
+    	  dir.forEach(println)
       } else {
         throw new Exception(s"Erro ao tentar conectar no SFTP")
       }
     } catch {
       case e: Throwable => e.printStackTrace()
-      log.error("Erro ao tentar conectar no SFTP: " + e.getMessage)
+//      log.error("Erro ao tentar conectar no SFTP: " + e.getMessage)
     }
   }
   
   def downloadDesdeSftp(sftp: ChannelSftp, localPath: String, remotePath: String){
     try{
     	if(sftp.isConnected()){
-      	var localDir:File = localPath.asInstanceOf[File]
-        if(!localPath.asInstanceOf[File].isDirectory()){
-          localDir.mkdir()
-        }
-        localDir = sftp.lcd(localPath).asInstanceOf[File]
-        getRemoteFile(sftp, remotePath, localDir)
-//        getRemoteFile(sftp, remotePath, localDir) // localDir: String
-        
-        disconnect(sftp)
+    	  getRemoteFile(sftp, localPath, remotePath)
       } else {
         throw new Exception(s"Erro ao tentar conectar no SFTP")
       }
     } catch {
       case e: Throwable => e.printStackTrace()
+    } finally {
+      disconnect(sftp)
     }
   }
   
@@ -84,25 +89,32 @@ class SftpClient {
     }
   }
   
-  def getRemoteFile(sftp: ChannelSftp, remotePath: String, localDir: File){
-//  def getRemoteFile(sftp: ChannelSftp, remotePath: String, localDir: String){
-    val files:Vector[ChannelSftp#LsEntry] = sftp.ls(remotePath).asInstanceOf
-    for(f <- files){
-      if(!f.getAttrs.isDir() && !(new java.io.File(localDir+"/"+f.getFilename)).exists){
-        sftp.get(f.getFilename.asInstanceOf[String], localDir.asInstanceOf[String])
-      } else if(f.getAttrs.isDir()) {
-        new File(localDir+"/"+f.getFilename).mkdir()
-        log.info(s"Pasta: ${f.getFilename} criada em: ${localDir}")
-        getRemoteFile(sftp, remotePath+"/"+f.getFilename, (localDir+"/"+f.getFilename).asInstanceOf[File])
-//        getRemoteFile(sftp, remotePath+"/"+f.getFilename, localDir+"/"+f.getFilename)
-      }
-    }
+  def getRemoteFile(sftp: ChannelSftp, localPath: String, remotePath: String){
+    val files = sftp.ls(remotePath)
+    	  files.forEach(c =>
+    	    if(!c.toString().endsWith(".")){
+    	      var entry: ChannelSftp#LsEntry = c.asInstanceOf[ChannelSftp#LsEntry]
+    	      if(!entry.getAttrs.isDir()){
+    	        sftp.lcd(localPath)
+    	        sftp.cd(remotePath)
+    	        sftp.get(entry.getFilename, sftp.lpwd()+"/"+entry.getFilename)
+    	      } else if(entry.getAttrs.isDir()){
+    	        var newLocalPath = localPath+"/"+entry.getFilename
+    	        new File(newLocalPath).mkdir()
+    	        sftp.lcd(newLocalPath)
+    	        var newRemotePath = remotePath+"/"+entry.getFilename
+    	        sftp.cd(newRemotePath)
+    	        getRemoteFile(sftp, newLocalPath, newRemotePath)
+    	      }
+    	    }
+    	  )
   }
-  
+    
+ 
   def putLocalFile(sftp: ChannelSftp, localFile: File, remotePath: String){
     if(localFile.isDirectory()){
       sftp.mkdir(localFile.getName)
-      log.info(s"Pasta: ${localFile.getName} criada em: ${remotePath}")
+//      log.info(s"Pasta: ${localFile.getName} criada em: ${remotePath}")
       var newRemotePath = remotePath+"/"+localFile.getName 
       sftp.cd(remotePath)
       for(f <- localFile.listFiles()){
@@ -110,7 +122,7 @@ class SftpClient {
       }
     } else {
       sftp.put(localFile.asInstanceOf[String], localFile.getName)
-      log.info(s"Copiando arquivo: ${localFile.getName} para: ${remotePath}")
+//      log.info(s"Copiando arquivo: ${localFile.getName} para: ${remotePath}")
     }
   }
   
@@ -118,7 +130,7 @@ class SftpClient {
     if(sftp.isConnected()) {
       sftp.disconnect()
       sftp.exit()
-      log.info(s"Desconexao do servidor SFTP com sucesso")
+//      log.info(s"Desconexao do servidor SFTP com sucesso")
     }
   }
   
