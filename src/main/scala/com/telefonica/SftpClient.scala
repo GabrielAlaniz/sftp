@@ -8,8 +8,8 @@ import org.apache.log4j.Logger
 import java.io.FileInputStream
 
 class SftpClient {
-//  @transient
-//  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
   
   def setupConnection(username: String, password: String, host: String, port: String): ChannelSftp = {
     val jsch = new JSch()
@@ -24,14 +24,11 @@ class SftpClient {
       if(jschSession.isConnected()){
         sftp = (jschSession.openChannel("sftp")).asInstanceOf[ChannelSftp]
         sftp.connect()
-//        log.info("Conexão exitosa")
-      } else {
-       throw new Exception(s"Erro ao tentar conectar no SFTP") 
-//       log.error("Nao e possivel connector ao servidor SFTP")
+        log.info("Conexão ao servidor SFTP com sucesso")
       }
     } catch{
-      case e: Throwable => e.printStackTrace()
-//      log.error("Erro ao tentar conectar no SFTP: " + e.getMessage)
+      case e: Throwable => 
+      log.error(("Erro ao tentar conectar com o servidor SFTP"))
     }
     return sftp
   }
@@ -51,13 +48,11 @@ class SftpClient {
   	        }
   	      } 
     	  )
+    	  log.info("Lista de arquivos obtidos com sucesso")
     	  dir.forEach(println)
-      } else {
-        throw new Exception(s"Erro ao tentar conectar no SFTP")
       }
     } catch {
-      case e: Throwable => e.printStackTrace()
-//      log.error("Erro ao tentar conectar no SFTP: " + e.getMessage)
+      case e: Throwable => log.error("Erro no path: "+e.getMessage)
     }
   }
   
@@ -65,11 +60,9 @@ class SftpClient {
     try{
     	if(sftp.isConnected()){
     	  getRemoteFile(sftp, localPath, remotePath)
-      } else {
-        throw new Exception(s"Erro ao tentar conectar no SFTP")
       }
     } catch {
-      case e: Throwable => e.printStackTrace()
+      case e: Throwable => log.error("Erro no path: "+e.getMessage)
     } 
     finally {
       disconnect(sftp)
@@ -80,11 +73,9 @@ class SftpClient {
     try{
       if(sftp.isConnected()){
         putLocalFile(sftp, localDir, remotePath)
-      } else {
-        throw new Exception(s"Erro ao tentar conectar no SFTP")
       }
     } catch {
-      case e: Throwable => e.printStackTrace()
+      case e: Throwable => log.error("Erro no path: "+e.getMessage)
     }
     finally {
       sftp.disconnect()
@@ -100,6 +91,7 @@ class SftpClient {
     	        sftp.lcd(localPath)
     	        sftp.cd(remotePath)
     	        sftp.get(entry.getFilename, sftp.lpwd()+"/"+entry.getFilename)
+    	        log.info(s"Transferência de arquivo ${entry.getFilename} para o diretório ${localPath}")
     	      } else if(entry.getAttrs.isDir()){
     	        var newLocalPath = localPath+"/"+entry.getFilename
     	        new File(newLocalPath).mkdir()
@@ -125,6 +117,7 @@ class SftpClient {
             sftp.cd(remotePath)
             println(sftp.pwd().toString())
             sftp.put(entry.getFilename, sftp.pwd()+"/"+entry.getFilename)
+            log.info(s"Transferência de arquivo ${entry.getFilename} para o diretório SFTP: ${remotePath}")
           } else if(entry.getAttrs.isDir()){
             var newLocalDir = localDir+"/"+entry.getFilename
             var newRemotePath = remotePath+"/"+entry.getFilename
@@ -138,24 +131,12 @@ class SftpClient {
     }
   }
   
-  /*if(localFile.isDirectory()){
-      sftp.mkdir(localFile.getName)
-//      log.info(s"Pasta: ${localFile.getName} criada em: ${remotePath}")
-      var newRemotePath = remotePath+"/"+localFile.getName 
-      sftp.cd(remotePath)
-      for(f <- localFile.listFiles()){
-        putLocalFile(sftp, f, newRemotePath)
-      }
-    } else {
-      sftp.put(localFile.asInstanceOf[String], localFile.getName)
-//      log.info(s"Copiando arquivo: ${localFile.getName} para: ${remotePath}")
-    }*/
 
   def disconnect(sftp: ChannelSftp){
     if(sftp.isConnected()) {
       sftp.disconnect()
       sftp.exit()
-//      log.info(s"Desconexao do servidor SFTP com sucesso")
+      log.info(s"Desconexao do servidor SFTP com sucesso")
     }
   }
   
