@@ -70,22 +70,24 @@ class SftpClient {
       }
     } catch {
       case e: Throwable => e.printStackTrace()
-    } finally {
+    } 
+    finally {
       disconnect(sftp)
     }
   }
   
-  def uploadDesdeLocal(sftp: ChannelSftp, localFile: String, remotePath: String){
+  def uploadDesdeLocal(sftp: ChannelSftp, localDir: String, remotePath: String){
     try{
       if(sftp.isConnected()){
-        putLocalFile(sftp, localFile.asInstanceOf[File], remotePath)
-        
-        disconnect(sftp)
+        putLocalFile(sftp, localDir, remotePath)
       } else {
         throw new Exception(s"Erro ao tentar conectar no SFTP")
       }
     } catch {
       case e: Throwable => e.printStackTrace()
+    }
+    finally {
+      sftp.disconnect()
     }
   }
   
@@ -111,8 +113,32 @@ class SftpClient {
   }
     
  
-  def putLocalFile(sftp: ChannelSftp, localFile: File, remotePath: String){
-    if(localFile.isDirectory()){
+  def putLocalFile(sftp: ChannelSftp, localDir: String, remotePath: String){
+    try{
+      val files = sftp.ls(localDir)
+      files.forEach(c =>
+        if(!c.toString().endsWith(".")){
+          var entry: ChannelSftp#LsEntry = c.asInstanceOf[ChannelSftp#LsEntry]
+          if(!entry.getAttrs.isDir()){
+            sftp.lcd(localDir)
+            println(sftp.lpwd().toString())
+            sftp.cd(remotePath)
+            println(sftp.pwd().toString())
+            sftp.put(entry.getFilename, sftp.pwd()+"/"+entry.getFilename)
+          } else if(entry.getAttrs.isDir()){
+            var newLocalDir = localDir+"/"+entry.getFilename
+            var newRemotePath = remotePath+"/"+entry.getFilename
+            new File(newRemotePath).mkdir()
+            putLocalFile(sftp, newLocalDir, newRemotePath)
+          }
+        }
+      )
+    } catch {
+      case e: Throwable => e.printStackTrace()
+    }
+  }
+  
+  /*if(localFile.isDirectory()){
       sftp.mkdir(localFile.getName)
 //      log.info(s"Pasta: ${localFile.getName} criada em: ${remotePath}")
       var newRemotePath = remotePath+"/"+localFile.getName 
@@ -123,9 +149,8 @@ class SftpClient {
     } else {
       sftp.put(localFile.asInstanceOf[String], localFile.getName)
 //      log.info(s"Copiando arquivo: ${localFile.getName} para: ${remotePath}")
-    }
-  }
-  
+    }*/
+
   def disconnect(sftp: ChannelSftp){
     if(sftp.isConnected()) {
       sftp.disconnect()
