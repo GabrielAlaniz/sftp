@@ -1,0 +1,390 @@
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Lista de arquivos obtidos com sucesso
+[main] INFO  com.telefonica.SftpClient  - Lista de arquivos obtidos com sucesso
+[main] INFO  com.telefonica.SftpClient  - Lista de arquivos obtidos com sucesso
+[main] INFO  com.telefonica.SftpClient  - Lista de arquivos obtidos com sucesso
+[main] INFO  com.telefonica.SftpClient  - Lista de arquivos obtidos com sucesso
+[main] INFO  com.telefonica.SftpClient  - Lista de arquivos obtidos com sucesso
+[main] INFO  com.telefonica.SftpClient  - Lista de arquivos obtidos com sucesso
+[main] INFO  com.telefonica.SftpClient  - Lista de arquivos obtidos com sucesso
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo servidor5.txt para o diretório /home/hdp/Documents/directoriosftp//carpeta1servidor
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo otrodocumento.txt para o diretório /home/hdp/Documents/directoriosftp//carpeta1servidor/carpeta3interna
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo servidor6.csv para o diretório /home/hdp/Documents/directoriosftp//carpeta1servidor
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo final2.csv para o diretório /home/hdp/Documents/directoriosftp//carpeta2servidor/carpetainterna1
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo servidor1.txt para o diretório /home/hdp/Documents/directoriosftp//carpeta2servidor
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo servidor2.txt para o diretório /home/hdp/Documents/directoriosftp//carpeta2servidor
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo servidor3.csv para o diretório /home/hdp/Documents/directoriosftp//carpeta2servidor
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo servidorinterna1.txt para o diretório /home/hdp/Documents/directoriosftp//carpeta2servidor/carpetainterna2
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo servidorfinal.txt para o diretório /home/hdp/Documents/directoriosftp//carpeta2servidor/carpetainterna2/carpetafinal
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo servidorinterna3.xls para o diretório /home/hdp/Documents/directoriosftp//carpeta2servidor/carpetainterna2
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo servidorinterna2.csv para o diretório /home/hdp/Documents/directoriosftp//carpeta2servidor/carpetainterna2
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo servidorinterno.xls para o diretório /home/hdp/Documents/directoriosftp//carpeta2servidor
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo servidor1.txt para o diretório /home/hdp/Documents/directoriosftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo servidor2.txt para o diretório /home/hdp/Documents/directoriosftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo servidor3.csv para o diretório /home/hdp/Documents/directoriosftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal1.txt para o diretório /home/hdp/Documents/directoriosftp/
+[main] INFO  com.telefonica.SftpClient  - Desconexao do servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal1.txt para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal1.txt para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal1.txt para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal1.txt para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal1.txt para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal1.txt para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo arquivopasta3 para o diretório SFTP: /home/gabi/ftp//pasta3
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo arquivopasta1b para o diretório SFTP: /home/gabi/ftp//pasta1/pasta1b
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo arquivopasta1 para o diretório SFTP: /home/gabi/ftp//pasta1
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo arquivopasta2b para o diretório SFTP: /home/gabi/ftp//pasta2/pasta2b
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo arquivopasta2 para o diretório SFTP: /home/gabi/ftp//pasta2
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal1.txt para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal2 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal1.txt para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal2 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal1.txt para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal2 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal1.txt para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo arquivopasta3 para o diretório SFTP: /home/gabi/ftp/pasta3
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal2 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal1.txt para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo arquivopasta3 para o diretório SFTP: /home/gabi/ftp//pasta3
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal2 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo arquivopasta1 para o diretório SFTP: /home/gabi/ftp//pasta1
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo arquivopasta2 para o diretório SFTP: /home/gabi/ftp//pasta2
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal1.txt para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo arquivopasta3 para o diretório SFTP: /home/gabi/ftp//pasta3
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal2 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo arquivopasta1 para o diretório SFTP: /home/gabi/ftp//pasta1
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo arquivopasta2 para o diretório SFTP: /home/gabi/ftp//pasta2
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal1.txt para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal2 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal1.txt para o diretório SFTP: /home/gabi/ftp/
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        [main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Desconexao do servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal2 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal1.txt para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Desconexao do servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Desconexao do servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Desconexao do servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Desconexao do servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo arquivopasta3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal2 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo arquivopasta1b para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo arquivopasta1 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo arquivopasta2b para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo arquivopasta2 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal1.txt para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Desconexao do servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal2 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal1.txt para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Desconexao do servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Desconexao do servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Desconexao do servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal2 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal1.txt para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Desconexao do servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal2 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal1.txt para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Desconexao do servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal2 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal1.txt para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Desconexao do servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal2 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal1.txt para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Desconexao do servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal2 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal1.txt para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Desconexao do servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal2 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal1.txt para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Desconexao do servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal2 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal1.txt para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Desconexao do servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal2 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal1.txt para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Desconexao do servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Desconexao do servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Desconexao do servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal2 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal1.txt para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Desconexao do servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo b.txt para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Desconexao do servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo b.txt para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Desconexao do servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Desconexao do servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Desconexao do servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Conexão ao servidor SFTP com sucesso
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal3 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal2 para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Transferência de arquivo docLocal1.txt para o diretório SFTP: /home/gabi/ftp/
+[main] INFO  com.telefonica.SftpClient  - Desconexao do servidor SFTP com sucesso

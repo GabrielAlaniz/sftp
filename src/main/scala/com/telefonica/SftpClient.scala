@@ -78,7 +78,7 @@ class SftpClient {
       case e: Throwable => log.error("Erro no path: "+e.getMessage)
     }
     finally {
-      sftp.disconnect()
+      disconnect(sftp)
     }
   }
   
@@ -113,16 +113,21 @@ class SftpClient {
           var entry: ChannelSftp#LsEntry = c.asInstanceOf[ChannelSftp#LsEntry]
           if(!entry.getAttrs.isDir()){
             sftp.lcd(localDir)
-            println(sftp.lpwd().toString())
             sftp.cd(remotePath)
-            println(sftp.pwd().toString())
-            sftp.put(entry.getFilename, sftp.pwd()+"/"+entry.getFilename)
+            println(entry.getFilename+" - "+remotePath+entry.getFilename+" - "+localDir)
+            sftp.put(sftp.lpwd()+"/"+entry.getFilename, remotePath+entry.getFilename)
             log.info(s"Transferência de arquivo ${entry.getFilename} para o diretório SFTP: ${remotePath}")
           } else if(entry.getAttrs.isDir()){
-            var newLocalDir = localDir+"/"+entry.getFilename
-            var newRemotePath = remotePath+"/"+entry.getFilename
+          	var newLocalPath = localDir+entry.getFilename+"/"
+          	sftp.lcd(newLocalPath)
+          	println(newLocalPath)
+            var newRemotePath = remotePath+entry.getFilename+"/"
             new File(newRemotePath).mkdir()
-            putLocalFile(sftp, newLocalDir, newRemotePath)
+//            val perm = "777"
+//            sftp.chmod(Integer.parseInt(perm,8), remotePath)
+//            sftp.chmod(Integer.parseInt(perm,8), localDir)
+            println("Criada: "+newRemotePath)
+            putLocalFile(sftp, newLocalPath, newRemotePath)
           }
         }
       )
