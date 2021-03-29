@@ -27666,3 +27666,2494 @@ class SftpClient {
   }
   
 }
+[0m2021.03.25 15:08:29 INFO  Started: Metals version 0.10.0 in workspace '/home/hdp/Documents/sftpclient' for client vscode 1.54.3.[0m
+[0m2021.03.25 15:08:30 INFO  time: initialize in 1.1s[0m
+[0m2021.03.25 15:08:35 WARN  Build server is not auto-connectable.[0m
+[0m2021.03.25 15:08:35 WARN  no build target for: /home/hdp/Documents/sftpclient/src/main/scala/com/telefonica/SftpClient.scala[0m
+[0m2021.03.25 15:09:33 INFO  no build target: using presentation compiler with only scala-library: 2.12.13[0m
+[0m2021.03.26 10:03:13 INFO  Started: Metals version 0.10.0 in workspace '/home/hdp/Documents/sftpclient' for client vscode 1.54.3.[0m
+[0m2021.03.26 10:03:13 INFO  time: initialize in 0.85s[0m
+[0m2021.03.26 10:03:18 WARN  Build server is not auto-connectable.[0m
+[0m2021.03.26 10:03:19 INFO  skipping build import with status 'Requested'[0m
+[0m2021.03.26 10:08:45 WARN  no build target for: /home/hdp/Documents/sftpclient/src/main/scala/com/telefonica/SftpClient.scala[0m
+[0m2021.03.26 10:08:48 INFO  no build target: using presentation compiler with only scala-library: 2.12.13[0m
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+import java.io.FileInputStream
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+  def setupConnection(username: String, password: String, host: String, port: String): ChannelSftp = {
+    val jsch = new JSch()
+    var sftp = new ChannelSftp()
+    val jschSession = jsch.getSession(username,host, port.toInt)
+    jschSession.setPassword(password)
+    val config = new java.util.Properties()
+    config.put("StrictHostKeyChecking", "no")
+    jschSession.setConfig(config)
+    try{
+      jschSession.connect()
+      if(jschSession.isConnected()){
+        sftp = (jschSession.openChannel("sftp")).asInstanceOf[ChannelSftp]
+        sftp.connect()
+        log.info("Conexão ao servidor SFTP com sucesso")
+      }
+    } catch{
+      case e: Throwable => 
+      log.error(("Erro ao tentar conectar com o servidor SFTP"))
+    }
+    return sftp
+  }
+  
+  def listarArquivos(sftp:ChannelSftp, path:String){
+    try{
+      if(sftp.isConnected()){
+    	  val files = sftp.ls(path)
+			  var dir = new ArrayList[String]
+    	  files.forEach(c=>
+  	      if(!c.toString().endsWith(".") && !c.toString().endsWith("..")){
+    	      var entry: ChannelSftp#LsEntry = c.asInstanceOf[ChannelSftp#LsEntry]
+    	      if(!entry.getAttrs.isDir()){
+    	        dir.add(path+entry.getFilename)
+    	      } else if(entry.getAttrs.isDir()){
+    	        listarArquivos(sftp,path+entry.getFilename+"/")
+  	        }
+  	      } 
+    	  )
+    	  log.info("Lista de arquivos obtidos com sucesso")
+    	  dir.forEach(println)
+      }
+    } catch {
+      case e: Throwable => log.error("Erro no path: "+e.getMessage)
+    }
+  }
+  
+  def downloadDesdeSftp(sftp: ChannelSftp, localPath: String, remotePath: String){
+    try{
+    	if(sftp.isConnected()){
+    	  getRemoteFile(sftp, localPath, remotePath)
+      }
+    } catch {
+      case e: Throwable => log.error("Erro no path: "+e.getMessage)
+    } 
+    finally {
+      disconnect(sftp)
+    }
+  }
+  
+  def uploadDesdeLocal(sftp: ChannelSftp, localDir: String, remotePath: String){
+    try{
+      if(sftp.isConnected()){
+        putLocalFile(sftp, localDir, remotePath)
+      }
+    } catch {
+      case e: Throwable => log.error("Erro no path: "+e.getMessage)
+    }
+    finally {
+      disconnect(sftp)
+    }
+  }
+  
+  def getRemoteFile(sftp: ChannelSftp, localPath: String, remotePath: String){
+    val files = sftp.ls(remotePath)
+    files.forEach(c =>
+      if(!c.toString().endsWith(".")){
+        var entry: ChannelSftp#LsEntry = c.asInstanceOf[ChannelSftp#LsEntry]
+        if(!entry.getAttrs.isDir()){
+	  sftp.lcd(localPath)
+	  sftp.cd(remotePath)
+	  sftp.get(entry.getFilename, sftp.lpwd()+"/"+entry.getFilename)
+	  log.info(s"Transferência de arquivo ${entry.getFilename} para o diretório ${localPath}")
+        } else if(entry.getAttrs.isDir()){
+	  var newLocalPath = localPath+"/"+entry.getFilename
+	  new File(newLocalPath).mkdir()
+	  sftp.lcd(newLocalPath)
+	  var newRemotePath = remotePath+"/"+entry.getFilename
+	  sftp.cd(newRemotePath)
+	  getRemoteFile(sftp, newLocalPath, newRemotePath)
+        }
+      }
+    )
+  }
+    
+ 
+  def putLocalFile(sftp: ChannelSftp, localDir: String, remotePath: String){
+    try{
+      val files = sftp.ls(localDir)
+      files.forEach(c =>
+        if(!c.toString().endsWith(".")){
+          var entry: ChannelSftp#LsEntry = c.asInstanceOf[ChannelSftp#LsEntry]
+          if(!entry.getAttrs.isDir()){
+            sftp.lcd(localDir)
+            sftp.cd(remotePath)
+            println(entry.getFilename+" - "+remotePath+entry.getFilename+" - "+localDir)
+            sftp.put(sftp.lpwd()+"/"+entry.getFilename, remotePath+entry.getFilename)
+            log.info(s"Transferência de arquivo ${entry.getFilename} para o diretório SFTP: ${remotePath}")
+          } else if(entry.getAttrs.isDir()){
+	    var newLocalPath = localDir+entry.getFilename+"/"
+            sftp.lcd(newLocalPath)
+            var newRemotePath = remotePath+entry.getFilename+"/"
+            new File(newRemotePath).mkdir()
+            log.info("Pasta criada: "+newRemotePath)
+            putLocalFile(sftp, newLocalPath, newRemotePath)
+          }
+        }
+      )
+    } catch {
+      case e: Throwable => log.error("Erro ao descargar:"+e.getMessage)
+    }
+  }
+  
+
+  def disconnect(sftp: ChannelSftp){
+    if(sftp.isConnected()) {
+      sftp.disconnect()
+      sftp.exit()
+      log.info(s"Desconexao do servidor SFTP com sucesso")
+    }
+  }
+  
+  
+}
+
+[0m2021.03.26 10:08:51 INFO  time: code lens generation in 5.52s[0m
+package com.telefonica
+
+import java.io.File
+import org.apache.hadoop.conf.Configuration
+import com.jcraft.jsch.JSch
+import org.apache.hadoop.fs.FileSystem
+import org.apache.hadoop.fs.Path
+import com.jcraft.jsch.ChannelSftp
+import com.jcraft.jsch.SftpException
+import org.apache.log4j.Logger
+
+class FileTransfer extends Serializable {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+  def SftpTransferFromHdfs(hadoopConf: Configuration, hdfsDirectory: String, localDirectory: String,
+    user: String, pass: String, hostname: String, targetDirectory: String): Unit = {
+      val ssh = new JSch()
+      val fileSystem = FileSystem.get(hadoopConf)
+      val files = fileSystem.listStatus(new Path(hdfsDirectory))
+      val local = new File(localDirectory)
+      try {
+        val session = ssh.getSession(user, hostname)
+        session.setPassword(pass)
+        session.setConfig("StrictHostKeyChecking", "no")
+        session.connect()
+        if (session.isConnected) {
+          val channel = session.openChannel("sftp").asInstanceOf[ChannelSftp]
+          channel.connect()
+          if (channel.isConnected) {
+        	  createRemoteDirectory(channel, targetDirectory)
+        	  files.foreach(hdfsFile => {
+        		  if (hdfsFile.getPath.getName.endsWith(".csv")) {
+        			  log.info(s"Realizando o download do arquivo do HDFS: ${hdfsFile.getPath} para o diretorio local: ${local.getAbsolutePath}")
+        			  if (!local.isDirectory) {
+        				  local.mkdir()
+        			  }
+        			  fileSystem.copyToLocalFile(false, hdfsFile.getPath, new Path(localDirectory))
+
+        			  val localFile = new File(localDirectory + "/" + hdfsFile.getPath.getName)
+        			  if (localFile.isFile) {
+        				  channel.put(localDirectory + "/" + hdfsFile.getPath.getName, targetDirectory)
+        				  log.info(s"Removendo o arquivo local: ${localFile.getAbsolutePath}")
+        				  localFile.delete()
+        			  }
+        		  }
+        	  })
+        	  channel.disconnect()
+          }
+          session.disconnect()
+        } else {
+        	throw new Exception(s"Erro ao tentar conectar no SFTP: $user@$hostname")
+        }
+      } catch {
+      case e: Throwable =>
+      e.printStackTrace()
+      log.error("Erro ao tentar enviar os arquivos para o sftp: " + e.getMessage)
+      }
+  }
+
+  def clear(hadoopConf: Configuration, hdfs: String, unix: String): Unit = {
+		  log.info("Realizando a limpeza dos diretorios criados pelo processo!")
+		  FileSystem
+		  .get(hadoopConf)
+		  .delete(new Path(hdfs), true)
+		  
+		  new File(unix)
+		  .listFiles
+		  .foreach(_.delete())
+		  
+		  new File(unix)
+		  .delete()
+		  
+		  log.info("Diretorios temporários removidos")
+  }
+
+  def createRemoteDirectory(channel: ChannelSftp, directory: String): Unit = {
+	  val fullPath = directory.split("/")
+	  channel.cd("/")
+	  for (folder <- fullPath) {
+		  if (folder.length > 0) {
+			  try {
+          log.info("Current Dir : " + channel.pwd)
+				  channel.cd(folder)
+			  } catch {
+			  case e: SftpException =>
+			  channel.mkdir(folder)
+			  channel.cd(folder)
+			  }
+		  }
+	  }
+  }
+}
+[0m
+2021.03.26 10:52:20 WARN  no build target for: /home/hdp/Documents/sftpclient/src/main/scala/com/telefonica/FileTransfer.scala[0m
+[0m2021.03.26 10:52:22 INFO  time: code lens generation in 1.62s[0m
+mar 26, 2021 10:54:01 AM org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint notify
+INFO: Unsupported notification method: $/setTraceNotification
+mar 26, 2021 10:55:03 AM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 102
+mar 26, 2021 11:06:09 AM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 189
+mar 26, 2021 11:06:12 AM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 196
+mar 26, 2021 11:06:44 AM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 203
+[0m2021.03.26 11:08:11 INFO  shutting down Metals[0m
+[0m2021.03.27 18:45:47 INFO  Started: Metals version 0.10.0 in workspace '/home/hdp/Documents/sftpclient' for client vscode 1.54.3.[0m
+[0m2021.03.27 18:45:48 INFO  time: initialize in 0.74s[0m
+[0m2021.03.27 18:45:48 WARN  Build server is not auto-connectable.[0m
+[0m2021.03.27 18:45:48 WARN  no build target for: /home/hdp/Documents/sftpclient/src/main/scala/com/telefonica/FileTransfer.scala[0m
+[0m2021.03.27 18:45:48 WARN  no build target for: /home/hdp/Documents/sftpclient/src/main/scala/com/telefonica/SftpClient.scala[0m
+[0m2021.03.27 18:45:50 INFO  skipping build import with status 'Requested'[0m
+[0m2021.03.27 18:45:52 INFO  no build target: using presentation compiler with only scala-library: 2.12.13[0m
+package com.telefonica
+
+import java.io.File
+import org.apache.hadoop.conf.Configuration
+import com.jcraft.jsch.JSch
+import org.apache.hadoop.fs.FileSystem
+import org.apache.hadoop.fs.Path
+import com.jcraft.jsch.ChannelSftp
+import com.jcraft.jsch.SftpException
+import org.apache.log4j.Logger
+
+class FileTransfer extends Serializable {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+  def SftpTransferFromHdfs(hadoopConf: Configuration, hdfsDirectory: String, localDirectory: String,
+    user: String, pass: String, hostname: String, targetDirectory: String): Unit = {
+      val ssh = new JSch()
+      val fileSystem = FileSystem.get(hadoopConf)
+      val files = fileSystem.listStatus(new Path(hdfsDirectory))
+      val local = new File(localDirectory)
+      try {
+        val session = ssh.getSession(user, hostname)
+        session.setPassword(pass)
+        session.setConfig("StrictHostKeyChecking", "no")
+        session.connect()
+        if (session.isConnected) {
+          val channel = session.openChannel("sftp").asInstanceOf[ChannelSftp]
+          channel.connect()
+          if (channel.isConnected) {
+        	  createRemoteDirectory(channel, targetDirectory)
+        	  files.foreach(hdfsFile => {
+        		  if (hdfsFile.getPath.getName.endsWith(".csv")) {
+        			  log.info(s"Realizando o download do arquivo do HDFS: ${hdfsFile.getPath} para o diretorio local: ${local.getAbsolutePath}")
+        			  if (!local.isDirectory) {
+        				  local.mkdir()
+        			  }
+        			  fileSystem.copyToLocalFile(false, hdfsFile.getPath, new Path(localDirectory))
+
+        			  val localFile = new File(localDirectory + "/" + hdfsFile.getPath.getName)
+        			  if (localFile.isFile) {
+        				  channel.put(localDirectory + "/" + hdfsFile.getPath.getName, targetDirectory)
+        				  log.info(s"Removendo o arquivo local: ${localFile.getAbsolutePath}")
+        				  localFile.delete()
+        			  }
+        		  }
+        	  })
+        	  channel.disconnect()
+          }
+          session.disconnect()
+        } else {
+        	throw new Exception(s"Erro ao tentar conectar no SFTP: $user@$hostname")
+        }
+      } catch {
+      case e: Throwable =>
+      e.printStackTrace()
+      log.error("Erro ao tentar enviar os arquivos para o sftp: " + e.getMessage)
+      }
+  }
+
+  def clear(hadoopConf: Configuration, hdfs: String, unix: String): Unit = {
+		  log.info("Realizando a limpeza dos diretorios criados pelo processo!")
+		  FileSystem
+		  .get(hadoopConf)
+		  .delete(new Path(hdfs), true)
+		  
+		  new File(unix)
+		  .listFiles
+		  .foreach(_.delete())
+		  
+		  new File(unix)
+		  .delete()
+		  
+		  log.info("Diretorios temporários removidos")
+  }
+
+  def createRemoteDirectory(channel: ChannelSftp, directory: String): Unit = {
+	  val fullPath = directory.split("/")
+	  channel.cd("/")
+	  for (folder <- fullPath) {
+		  if (folder.length > 0) {
+			  try {
+          log.info("Current Dir : " + channel.pwd)
+				  channel.cd(folder)
+			  } catch {
+			  case e: SftpException =>
+			  channel.mkdir(folder)
+			  channel.cd(folder)
+			  }
+		  }
+	  }
+  }
+}
+
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+import java.io.FileInputStream
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+  def setupConnection(username: String, password: String, host: String, port: String): ChannelSftp = {
+    val jsch = new JSch()
+    var sftp = new ChannelSftp()
+    val jschSession = jsch.getSession(username,host, port.toInt)
+    jschSession.setPassword(password)
+    val config = new java.util.Properties()
+    config.put("StrictHostKeyChecking", "no")
+    jschSession.setConfig(config)
+    try{
+      jschSession.connect()
+      if(jschSession.isConnected()){
+        sftp = (jschSession.openChannel("sftp")).asInstanceOf[ChannelSftp]
+        sftp.connect()
+        log.info("Conexão ao servidor SFTP com sucesso")
+      }
+    } catch{
+      case e: Throwable => 
+      log.error(("Erro ao tentar conectar com o servidor SFTP"))
+    }
+    return sftp
+  }
+  
+  def listarArquivos(sftp:ChannelSftp, path:String){
+    try{
+      if(sftp.isConnected()){
+    	  val files = sftp.ls(path)
+			  var dir = new ArrayList[String]
+    	  files.forEach(c=>
+  	      if(!c.toString().endsWith(".") && !c.toString().endsWith("..")){
+    	      var entry: ChannelSftp#LsEntry = c.asInstanceOf[ChannelSftp#LsEntry]
+    	      if(!entry.getAttrs.isDir()){
+    	        dir.add(path+entry.getFilename)
+    	      } else if(entry.getAttrs.isDir()){
+    	        listarArquivos(sftp,path+entry.getFilename+"/")
+  	        }
+  	      } 
+    	  )
+    	  log.info("Lista de arquivos obtidos com sucesso")
+    	  dir.forEach(println)
+      }
+    } catch {
+      case e: Throwable => log.error("Erro no path: "+e.getMessage)
+    }
+  }
+  
+  def downloadDesdeSftp(sftp: ChannelSftp, localPath: String, remotePath: String){
+    try{
+    	if(sftp.isConnected()){
+    	  getRemoteFile(sftp, localPath, remotePath)
+      }
+    } catch {
+      case e: Throwable => log.error("Erro no path: "+e.getMessage)
+    } 
+    finally {
+      disconnect(sftp)
+    }
+  }
+  
+  def uploadDesdeLocal(sftp: ChannelSftp, localDir: String, remotePath: String){
+    try{
+      if(sftp.isConnected()){
+        putLocalFile(sftp, localDir, remotePath)
+      }
+    } catch {
+      case e: Throwable => log.error("Erro no path: "+e.getMessage)
+    }
+    finally {
+      disconnect(sftp)
+    }
+  }
+  
+  def getRemoteFile(sftp: ChannelSftp, localPath: String, remotePath: String){
+    val files = sftp.ls(remotePath)
+    files.forEach(c =>
+      if(!c.toString().endsWith(".")){
+        var entry: ChannelSftp#LsEntry = c.asInstanceOf[ChannelSftp#LsEntry]
+        if(!entry.getAttrs.isDir()){
+	  sftp.lcd(localPath)
+	  sftp.cd(remotePath)
+	  sftp.get(entry.getFilename, sftp.lpwd()+"/"+entry.getFilename)
+	  log.info(s"Transferência de arquivo ${entry.getFilename} para o diretório ${localPath}")
+        } else if(entry.getAttrs.isDir()){
+	  var newLocalPath = localPath+"/"+entry.getFilename
+	  new File(newLocalPath).mkdir()
+	  sftp.lcd(newLocalPath)
+	  var newRemotePath = remotePath+"/"+entry.getFilename
+	  sftp.cd(newRemotePath)
+	  getRemoteFile(sftp, newLocalPath, newRemotePath)
+        }
+      }
+    )
+  }
+    
+ 
+  def putLocalFile(sftp: ChannelSftp, localDir: String, remotePath: String){
+    try{
+      val files = sftp.ls(localDir)
+      files.forEach(c =>
+        if(!c.toString().endsWith(".")){
+          var entry: ChannelSftp#LsEntry = c.asInstanceOf[ChannelSftp#LsEntry]
+          if(!entry.getAttrs.isDir()){
+            sftp.lcd(localDir)
+            sftp.cd(remotePath)
+            println(entry.getFilename+" - "+remotePath+entry.getFilename+" - "+localDir)
+            sftp.put(sftp.lpwd()+"/"+entry.getFilename, remotePath+entry.getFilename)
+            log.info(s"Transferência de arquivo ${entry.getFilename} para o diretório SFTP: ${remotePath}")
+          } else if(entry.getAttrs.isDir()){
+	    var newLocalPath = localDir+entry.getFilename+"/"
+            sftp.lcd(newLocalPath)
+            var newRemotePath = remotePath+entry.getFilename+"/"
+            new File(newRemotePath).mkdir()
+            log.info("Pasta criada: "+newRemotePath)
+            putLocalFile(sftp, newLocalPath, newRemotePath)
+          }
+        }
+      )
+    } catch {
+      case e: Throwable => log.error("Erro ao descargar:"+e.getMessage)
+    }
+  }
+  
+
+  def disconnect(sftp: ChannelSftp){
+    if(sftp.isConnected()) {
+      sftp.disconnect()
+      sftp.exit()
+      log.info(s"Desconexao do servidor SFTP com sucesso")
+    }
+  }
+  
+  
+}
+
+[0m2021.03.27 18:45:56 INFO  time: code lens generation in 6.83s[0m
+[0m2021.03.27 18:48:35 WARN  no build target for: /home/hdp/Documents/sftpclient/src/main/scala/com/telefonica/FileTransfer.scala[0m
+[0m2021.03.27 18:48:35 WARN  no build target for: /home/hdp/Documents/sftpclient/src/main/scala/com/telefonica/FileTransfer.scala[0m
+[0m2021.03.27 18:48:35 WARN  no build target for: /home/hdp/Documents/sftpclient/src/main/scala/com/telefonica/FileTransfer.scala[0m
+[0m2021.03.27 18:48:36 WARN  no build target for: /home/hdp/Documents/sftpclient/src/main/scala/com/telefonica/FileTransfer.scala[0m
+mar 27, 2021 6:49:38 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 87
+mar 27, 2021 6:50:42 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 99
+[0m2021.03.27 18:58:29 WARN  no build target for: /home/hdp/Documents/sftpclient/src/main/scala/com/telefonica/SingletonSftp.scala[0m
+
+
+
+
+mar 27, 2021 6:58:32 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 130
+mar 27, 2021 6:59:13 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 153
+
+
+
+mar 27, 2021 6:59:15 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint fallbackResponseError
+SEVERE: Internal error: java.lang.IllegalArgumentException: 10 is not a valid line number, allowed [0..0]
+java.util.concurrent.CompletionException: java.lang.IllegalArgumentException: 10 is not a valid line number, allowed [0..0]
+	at java.util.concurrent.CompletableFuture.encodeThrowable(CompletableFuture.java:292)
+	at java.util.concurrent.CompletableFuture.completeThrowable(CompletableFuture.java:308)
+	at java.util.concurrent.CompletableFuture.uniAccept(CompletableFuture.java:661)
+	at java.util.concurrent.CompletableFuture$UniAccept.tryFire(CompletableFuture.java:646)
+	at java.util.concurrent.CompletableFuture.postComplete(CompletableFuture.java:488)
+	at java.util.concurrent.CompletableFuture.completeExceptionally(CompletableFuture.java:1990)
+	at scala.meta.internal.metals.CancelTokens$.$anonfun$future$1(CancelTokens.scala:40)
+	at scala.meta.internal.metals.CancelTokens$.$anonfun$future$1$adapted(CancelTokens.scala:38)
+	at scala.concurrent.impl.CallbackRunnable.run(Promise.scala:64)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:748)
+Caused by: java.lang.IllegalArgumentException: 10 is not a valid line number, allowed [0..0]
+	at scala.meta.internal.inputs.InternalInput.lineToOffset(InternalInput.scala:38)
+	at scala.meta.internal.inputs.InternalInput.lineToOffset$(InternalInput.scala:33)
+	at scala.meta.inputs.Input$VirtualFile.lineToOffset(Input.scala:80)
+	at scala.meta.inputs.Position$Range$.apply(Position.scala:59)
+	at scala.meta.internal.mtags.CommonMtagsEnrichments$XtensionLspRange.toMeta(CommonMtagsEnrichments.scala:183)
+	at scala.meta.internal.metals.codeactions.InsertInferredType.$anonfun$contribute$5(InsertInferredType.scala:85)
+	at scala.Option.map(Option.scala:230)
+	at scala.meta.internal.metals.codeactions.InsertInferredType.$anonfun$contribute$1(InsertInferredType.scala:84)
+	at scala.concurrent.Future$.$anonfun$apply$1(Future.scala:659)
+	at scala.util.Success.$anonfun$map$1(Try.scala:255)
+	at scala.util.Success.map(Try.scala:213)
+	at scala.concurrent.Future.$anonfun$map$1(Future.scala:292)
+	at scala.concurrent.impl.Promise.liftedTree1$1(Promise.scala:33)
+	at scala.concurrent.impl.Promise.$anonfun$transform$1(Promise.scala:33)
+	... 4 more
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[0m2021.03.27 19:00:04 WARN  no build target for: /home/hdp/Documents/sftpclient/src/main/scala/com/telefonica/SingletonSftp.scala[0m
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+mar 27, 2021 7:00:38 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 212
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+mar 27, 2021 7:00:48 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 230
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+
+}
+[0m2021.03.27 19:16:27 WARN  no build target for: /home/hdp/Documents/sftpclient/src/main/scala/com/telefonica/SingletonSftp.scala[0m
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+mar 27, 2021 7:16:37 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 411
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+mar 27, 2021 7:16:55 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 427
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+mar 27, 2021 7:17:30 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 470
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+mar 27, 2021 7:17:45 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 493
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+mar 27, 2021 7:21:49 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 517
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+mar 27, 2021 7:22:25 PM scala.meta.internal.pc.CompilerAccess handleError
+SEVERE: String index out of range: -2
+java.lang.StringIndexOutOfBoundsException: String index out of range: -2
+	at java.lang.String.<init>(String.java:196)
+	at scala.tools.nsc.interactive.Global.typeCompletions$1(Global.scala:1230)
+	at scala.tools.nsc.interactive.Global.completionsAt(Global.scala:1253)
+	at scala.meta.internal.pc.SignatureHelpProvider.$anonfun$treeSymbol$1(SignatureHelpProvider.scala:375)
+	at scala.Option.map(Option.scala:230)
+	at scala.meta.internal.pc.SignatureHelpProvider.treeSymbol(SignatureHelpProvider.scala:373)
+	at scala.meta.internal.pc.SignatureHelpProvider$MethodCall$.unapply(SignatureHelpProvider.scala:198)
+	at scala.meta.internal.pc.SignatureHelpProvider$MethodCallTraverser.visit(SignatureHelpProvider.scala:309)
+	at scala.meta.internal.pc.SignatureHelpProvider$MethodCallTraverser.traverse(SignatureHelpProvider.scala:303)
+	at scala.meta.internal.pc.SignatureHelpProvider$MethodCallTraverser.fromTree(SignatureHelpProvider.scala:272)
+	at scala.meta.internal.pc.SignatureHelpProvider.signatureHelp(SignatureHelpProvider.scala:27)
+
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+mar 27, 2021 7:22:33 PM scala.meta.internal.pc.CompilerAccess handleError
+SEVERE: String index out of range: -2
+java.lang.StringIndexOutOfBoundsException: String index out of range: -2
+	at java.lang.String.<init>(String.java:196)
+	at scala.tools.nsc.interactive.Global.typeCompletions$1(Global.scala:1230)
+	at scala.tools.nsc.interactive.Global.completionsAt(Global.scala:1253)
+	at scala.meta.internal.pc.SignatureHelpProvider.$anonfun$treeSymbol$1(SignatureHelpProvider.scala:375)
+	at scala.Option.map(Option.scala:230)
+	at scala.meta.internal.pc.SignatureHelpProvider.treeSymbol(SignatureHelpProvider.scala:373)
+	at scala.meta.internal.pc.SignatureHelpProvider$MethodCall$.unapply(SignatureHelpProvider.scala:198)
+	at scala.meta.internal.pc.SignatureHelpProvider$MethodCallTraverser.visit(SignatureHelpProvider.scala:309)
+	at scala.meta.internal.pc.SignatureHelpProvider$MethodCallTraverser.traverse(SignatureHelpProvider.scala:303)
+	at scala.meta.internal.pc.SignatureHelpProvider$MethodCallTraverser.fromTree(SignatureHelpProvider.scala:272)
+	at scala.meta.internal.pc.SignatureHelpProvider.signatureHelp(SignatureHelpProvider.scala:27)
+
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+mar 27, 2021 7:22:35 PM scala.meta.internal.pc.CompilerAccess handleError
+SEVERE: String index out of range: -2
+java.lang.StringIndexOutOfBoundsException: String index out of range: -2
+	at java.lang.String.<init>(String.java:196)
+	at scala.tools.nsc.interactive.Global.typeCompletions$1(Global.scala:1230)
+	at scala.tools.nsc.interactive.Global.completionsAt(Global.scala:1253)
+	at scala.meta.internal.pc.SignatureHelpProvider.$anonfun$treeSymbol$1(SignatureHelpProvider.scala:375)
+	at scala.Option.map(Option.scala:230)
+	at scala.meta.internal.pc.SignatureHelpProvider.treeSymbol(SignatureHelpProvider.scala:373)
+	at scala.meta.internal.pc.SignatureHelpProvider$MethodCall$.unapply(SignatureHelpProvider.scala:198)
+	at scala.meta.internal.pc.SignatureHelpProvider$MethodCallTraverser.visit(SignatureHelpProvider.scala:309)
+	at scala.meta.internal.pc.SignatureHelpProvider$MethodCallTraverser.traverse(SignatureHelpProvider.scala:303)
+	at scala.meta.internal.pc.SignatureHelpProvider$MethodCallTraverser.fromTree(SignatureHelpProvider.scala:272)
+	at scala.meta.internal.pc.SignatureHelpProvider.signatureHelp(SignatureHelpProvider.scala:27)
+
+mar 27, 2021 7:22:36 PM scala.meta.internal.pc.CompilerAccess handleError
+SEVERE: String index out of range: -2
+java.lang.StringIndexOutOfBoundsException: String index out of range: -2
+	at java.lang.String.<init>(String.java:196)
+	at scala.tools.nsc.interactive.Global.typeCompletions$1(Global.scala:1230)
+	at scala.tools.nsc.interactive.Global.completionsAt(Global.scala:1253)
+	at scala.meta.internal.pc.SignatureHelpProvider.$anonfun$treeSymbol$1(SignatureHelpProvider.scala:375)
+	at scala.Option.map(Option.scala:230)
+	at scala.meta.internal.pc.SignatureHelpProvider.treeSymbol(SignatureHelpProvider.scala:373)
+	at scala.meta.internal.pc.SignatureHelpProvider$MethodCall$.unapply(SignatureHelpProvider.scala:198)
+	at scala.meta.internal.pc.SignatureHelpProvider$MethodCallTraverser.visit(SignatureHelpProvider.scala:309)
+	at scala.meta.internal.pc.SignatureHelpProvider$MethodCallTraverser.traverse(SignatureHelpProvider.scala:303)
+	at scala.meta.internal.pc.SignatureHelpProvider$MethodCallTraverser.fromTree(SignatureHelpProvider.scala:272)
+	at scala.meta.internal.pc.SignatureHelpProvider.signatureHelp(SignatureHelpProvider.scala:27)
+
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+mar 27, 2021 7:22:39 PM scala.meta.internal.pc.CompilerAccess handleError
+SEVERE: String index out of range: -2
+java.lang.StringIndexOutOfBoundsException: String index out of range: -2
+	at java.lang.String.<init>(String.java:196)
+	at scala.tools.nsc.interactive.Global.typeCompletions$1(Global.scala:1230)
+	at scala.tools.nsc.interactive.Global.completionsAt(Global.scala:1253)
+	at scala.meta.internal.pc.SignatureHelpProvider.$anonfun$treeSymbol$1(SignatureHelpProvider.scala:375)
+	at scala.Option.map(Option.scala:230)
+	at scala.meta.internal.pc.SignatureHelpProvider.treeSymbol(SignatureHelpProvider.scala:373)
+	at scala.meta.internal.pc.SignatureHelpProvider$MethodCall$.unapply(SignatureHelpProvider.scala:198)
+	at scala.meta.internal.pc.SignatureHelpProvider$MethodCallTraverser.visit(SignatureHelpProvider.scala:309)
+	at scala.meta.internal.pc.SignatureHelpProvider$MethodCallTraverser.traverse(SignatureHelpProvider.scala:303)
+	at scala.meta.internal.pc.SignatureHelpProvider$MethodCallTraverser.fromTree(SignatureHelpProvider.scala:272)
+	at scala.meta.internal.pc.SignatureHelpProvider.signatureHelp(SignatureHelpProvider.scala:27)
+
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+mar 27, 2021 7:22:39 PM scala.meta.internal.pc.CompilerAccess handleError
+SEVERE: String index out of range: -2
+java.lang.StringIndexOutOfBoundsException: String index out of range: -2
+	at java.lang.String.<init>(String.java:196)
+	at scala.tools.nsc.interactive.Global.typeCompletions$1(Global.scala:1230)
+	at scala.tools.nsc.interactive.Global.completionsAt(Global.scala:1253)
+	at scala.meta.internal.pc.SignatureHelpProvider.$anonfun$treeSymbol$1(SignatureHelpProvider.scala:375)
+	at scala.Option.map(Option.scala:230)
+	at scala.meta.internal.pc.SignatureHelpProvider.treeSymbol(SignatureHelpProvider.scala:373)
+	at scala.meta.internal.pc.SignatureHelpProvider$MethodCall$.unapply(SignatureHelpProvider.scala:198)
+	at scala.meta.internal.pc.SignatureHelpProvider$MethodCallTraverser.visit(SignatureHelpProvider.scala:309)
+	at scala.meta.internal.pc.SignatureHelpProvider$MethodCallTraverser.traverse(SignatureHelpProvider.scala:303)
+	at scala.meta.internal.pc.SignatureHelpProvider$MethodCallTraverser.fromTree(SignatureHelpProvider.scala:272)
+	at scala.meta.internal.pc.SignatureHelpProvider.signatureHelp(SignatureHelpProvider.scala:27)
+
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  
+}
+[0m2021.03.27 19:22:59 WARN  no build target for: /home/hdp/Documents/sftpclient/src/main/scala/com/telefonica/SingletonSftp.scala[0m
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  def listarArquivos(username: String, password: String, host: String, port: String, path:String){
+    
+    setupConnection(username, password, host, port)
+
+    
+  }
+
+  def setupConnection(username: String, password: String, host: String, port: String): ChannelSftp = {
+    val jsch = new JSch()
+    var sftp = new ChannelSftp()
+    val jschSession = jsch.getSession(username,host, port.toInt)
+    jschSession.setPassword(password)
+    val config = new java.util.Properties()
+    config.put("StrictHostKeyChecking", "no")
+    jschSession.setConfig(config)
+    try{
+      jschSession.connect()
+      if(jschSession.isConnected()){
+        sftp = (jschSession.openChannel("sftp")).asInstanceOf[ChannelSftp]
+        sftp.connect()
+        log.info("Conexão ao servidor SFTP com sucesso")
+      }
+    } catch{
+      case e: Throwable => 
+      log.error(("Erro ao tentar conectar com o servidor SFTP"))
+    }
+    return sftp
+  }
+}
+
+mar 27, 2021 10:12:56 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 714
+mar 27, 2021 10:13:50 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 738
+[0m2021.03.27 22:14:47 WARN  no build target for: /home/hdp/Documents/sftpclient/src/main/scala/com/telefonica/SingletonSftp.scala[0m
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  def listarArquivos(username: String, password: String, host: String, port: String, path:String){
+    
+    val sftp = setupConnection(username, password, host, port)
+
+    
+
+    
+  }
+
+  def setupConnection(username: String, password: String, host: String, port: String): ChannelSftp = {
+    val jsch = new JSch()
+    var sftp = new ChannelSftp()
+    val jschSession = jsch.getSession(username,host, port.toInt)
+    jschSession.setPassword(password)
+    val config = new java.util.Properties()
+    config.put("StrictHostKeyChecking", "no")
+    jschSession.setConfig(config)
+    try{
+      jschSession.connect()
+      if(jschSession.isConnected()){
+        sftp = (jschSession.openChannel("sftp")).asInstanceOf[ChannelSftp]
+        sftp.connect()
+        log.info("Conexão ao servidor SFTP com sucesso")
+      }
+    } catch{
+      case e: Throwable => 
+      log.error(("Erro ao tentar conectar com o servidor SFTP"))
+    }
+    return sftp
+  }
+}
+
+mar 27, 2021 10:15:25 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 798
+mar 27, 2021 10:16:07 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 817
+[0m2021.03.27 22:16:09 WARN  no build target for: /home/hdp/Documents/sftpclient/src/main/scala/com/telefonica/SftpClient.scala[0m
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+class SftpClient {
+  @transient
+  lazy val log: Logger = Logger.getLogger(getClass.getName)
+  
+  def setupConnection(username: String, password: String, host: String, port: String): ChannelSftp = {
+    val jsch = new JSch()
+    var sftp = new ChannelSftp()
+    val jschSession = jsch.getSession(username,host, port.toInt)
+    jschSession.setPassword(password)
+    val config = new java.util.Properties()
+    config.put("StrictHostKeyChecking", "no")
+    jschSession.setConfig(config)
+    try{
+      jschSession.connect()
+      if(jschSession.isConnected()){
+        sftp = (jschSession.openChannel("sftp")).asInstanceOf[ChannelSftp]
+        sftp.connect()
+        log.info("Conexão ao servidor SFTP com sucesso")
+      }
+    } catch{
+      case e: Throwable => 
+      log.error(("Erro ao tentar conectar com o servidor SFTP"))
+    }
+    return sftp
+  }
+  
+  def listarArquivos(sftp:ChannelSftp, path:String){
+    try{
+      if(sftp.isConnected()){
+    	  val files = sftp.ls(path)
+			  var dir = new ArrayList[String]
+    	  files.forEach(c=>
+  	      if(!c.toString().endsWith(".") && !c.toString().endsWith("..")){
+    	      var entry: ChannelSftp#LsEntry = c.asInstanceOf[ChannelSftp#LsEntry]
+    	      if(!entry.getAttrs.isDir()){
+    	        dir.add(path+entry.getFilename)
+    	      } else if(entry.getAttrs.isDir()){
+    	        listarArquivos(sftp,path+entry.getFilename+"/")
+  	        }
+  	      } 
+    	  )
+    	  log.info("Lista de arquivos obtidos com sucesso")
+    	  dir.forEach(println)
+      }
+    } catch {
+      case e: Throwable => log.error("Erro no path: "+e.getMessage)
+    }
+  }
+  
+  def downloadDesdeSftp(sftp: ChannelSftp, localPath: String, remotePath: String){
+    try{
+    	if(sftp.isConnected()){
+    	  getRemoteFile(sftp, localPath, remotePath)
+      }
+    } catch {
+      case e: Throwable => log.error("Erro no path: "+e.getMessage)
+    } 
+    finally {
+      disconnect(sftp)
+    }
+  }
+  
+  def uploadDesdeLocal(sftp: ChannelSftp, localDir: String, remotePath: String){
+    try{
+      if(sftp.isConnected()){
+        putLocalFile(sftp, localDir, remotePath)
+      }
+    } catch {
+      case e: Throwable => log.error("Erro no path: "+e.getMessage)
+    }
+    finally {
+      disconnect(sftp)
+    }
+  }
+  
+  def getRemoteFile(sftp: ChannelSftp, localPath: String, remotePath: String){
+    val files = sftp.ls(remotePath)
+    files.forEach(c =>
+      if(!c.toString().endsWith(".")){
+        var entry: ChannelSftp#LsEntry = c.asInstanceOf[ChannelSftp#LsEntry]
+        if(!entry.getAttrs.isDir()){
+	  sftp.lcd(localPath)
+	  sftp.cd(remotePath)
+	  sftp.get(entry.getFilename, sftp.lpwd()+"/"+entry.getFilename)
+	  log.info(s"Transferência de arquivo ${entry.getFilename} para o diretório ${localPath}")
+        } else if(entry.getAttrs.isDir()){
+	  var newLocalPath = localPath+"/"+entry.getFilename
+	  new File(newLocalPath).mkdir()
+	  sftp.lcd(newLocalPath)
+	  var newRemotePath = remotePath+"/"+entry.getFilename
+	  sftp.cd(newRemotePath)
+	  getRemoteFile(sftp, newLocalPath, newRemotePath)
+        }
+      }
+    )
+  }
+    
+ 
+  def putLocalFile(sftp: ChannelSftp, localDir: String, remotePath: String){
+    try{
+      val files = sftp.ls(localDir)
+      files.forEach(c =>
+        if(!c.toString().endsWith(".")){
+          var entry: ChannelSftp#LsEntry = c.asInstanceOf[ChannelSftp#LsEntry]
+          if(!entry.getAttrs.isDir()){
+            sftp.lcd(localDir)
+            sftp.cd(remotePath)
+            println(entry.getFilename+" - "+remotePath+entry.getFilename+" - "+localDir)
+            sftp.put(sftp.lpwd()+"/"+entry.getFilename, remotePath+entry.getFilename)
+            log.info(s"Transferência de arquivo ${entry.getFilename} para o diretório SFTP: ${remotePath}")
+          } else if(entry.getAttrs.isDir()){
+	    var newLocalPath = localDir+entry.getFilename+"/"
+            sftp.lcd(newLocalPath)
+            var newRemotePath = remotePath+entry.getFilename+"/"
+            new File(newRemotePath).mkdir()
+            log.info("Pasta criada: "+newRemotePath)
+            putLocalFile(sftp, newLocalPath, newRemotePath)
+          }
+        }
+      )
+    } catch {
+      case e: Throwable => log.error("Erro ao descargar:"+e.getMessage)
+    }
+  }
+  
+
+  def disconnect(sftp: ChannelSftp){
+    if(sftp.isConnected()) {
+      sftp.disconnect()
+      sftp.exit()
+      log.info(s"Desconexao do servidor SFTP com sucesso")
+    }
+  }
+  
+  
+}
+
+[0m2021.03.27 22:17:11 WARN  no build target for: /home/hdp/Documents/sftpclient/src/main/scala/com/telefonica/SingletonSftp.scala[0m
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  def listarArquivos(username: String, password: String, host: String, port: String, path:String){
+    
+    val sftp = setupConnection(username, password, host, port)
+
+    try{
+      if(sftp.isConnected()){
+    	  val files = sftp.ls(path)
+			  
+    	  files.map(x => print(x))
+      }
+    } catch {
+      case e: Throwable => log.error("Erro no path: "+e.getMessage)
+    }
+
+    
+  }
+
+  def setupConnection(username: String, password: String, host: String, port: String): ChannelSftp = {
+    val jsch = new JSch()
+    var sftp = new ChannelSftp()
+    val jschSession = jsch.getSession(username,host, port.toInt)
+    jschSession.setPassword(password)
+    val config = new java.util.Properties()
+    config.put("StrictHostKeyChecking", "no")
+    jschSession.setConfig(config)
+    try{
+      jschSession.connect()
+      if(jschSession.isConnected()){
+        sftp = (jschSession.openChannel("sftp")).asInstanceOf[ChannelSftp]
+        sftp.connect()
+        log.info("Conexão ao servidor SFTP com sucesso")
+      }
+    } catch{
+      case e: Throwable => 
+      log.error(("Erro ao tentar conectar com o servidor SFTP"))
+    }
+    return sftp
+  }
+}
+
+[0m2021.03.27 22:19:51 WARN  no build target for: /home/hdp/Documents/sftpclient/src/main/scala/com/telefonica/SingletonSftp.scala[0m
+mar 27, 2021 10:20:38 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 995
+mar 27, 2021 10:20:44 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 1005
+mar 27, 2021 10:20:45 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 1011
+mar 27, 2021 10:20:45 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 1016
+mar 27, 2021 10:21:07 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 1054
+mar 27, 2021 10:21:55 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 1115
+mar 27, 2021 10:22:43 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 1228
+mar 27, 2021 10:22:48 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 1248
+mar 27, 2021 10:23:00 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 1268
+mar 27, 2021 10:23:31 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 1340
+mar 27, 2021 10:23:45 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 1366
+mar 27, 2021 10:24:34 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 1484
+mar 27, 2021 10:24:42 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 1496
+[0m2021.03.27 22:24:47 WARN  no build target for: /home/hdp/Documents/sftpclient/src/main/scala/com/telefonica/SingletonSftp.scala[0m
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  def listarArquivos(username: String, password: String, host: String, port: String, path:String){
+    
+    val sftp = setupConnection(username, password, host, port)
+
+    try{
+      if(sftp.isConnected()){
+    	  val files = sftp.ls(path)
+			  var dir = new ArrayList[String]
+    	  files.map(c => if(!c.toString().endsWith(".") && !c.toString().endsWith("..")){
+          if(!c.getAttrs.isDir){
+            dir.add(path+entry.getFilename)
+          } else if(c.getAttrs.isDir){
+            listarArquivos(username, password, host, port, path+entry.getFilename+"/")
+          }
+        })
+      }
+    } catch {
+      case e: Throwable => log.error("Erro no path: "+e.getMessage)
+    }
+
+    
+  }
+
+  def setupConnection(username: String, password: String, host: String, port: String): ChannelSftp = {
+    val jsch = new JSch()
+    var sftp = new ChannelSftp()
+    val jschSession = jsch.getSession(username,host, port.toInt)
+    jschSession.setPassword(password)
+    val config = new java.util.Properties()
+    config.put("StrictHostKeyChecking", "no")
+    jschSession.setConfig(config)
+    try{
+      jschSession.connect()
+      if(jschSession.isConnected()){
+        sftp = (jschSession.openChannel("sftp")).asInstanceOf[ChannelSftp]
+        sftp.connect()
+        log.info("Conexão ao servidor SFTP com sucesso")
+      }
+    } catch{
+      case e: Throwable => 
+      log.error(("Erro ao tentar conectar com o servidor SFTP"))
+    }
+    return sftp
+  }
+}
+
+[0m2021.03.27 22:35:28 WARN  no build target for: /home/hdp/Documents/sftpclient/src/main/scala/com/telefonica/SingletonSftp.scala[0m
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+  def listarArquivos(username: String, password: String, host: String, port: String, path: String){
+    
+    val sftp = setupConnection(username, password, host, port)
+
+    try{
+      if(sftp.isConnected()){
+    	  val files = sftp.ls(path)
+			  var dir = new ArrayList[String]
+    	  files.map(c => if(!c.toString().endsWith(".") && !c.toString().endsWith("..")){
+          if(!c.getAttrs.isDir){
+            dir.add(path+entry.getFilename)
+          } else if(c.getAttrs.isDir){
+            listarArquivos(username, password, host, port, path+entry.getFilename+"/")
+          }
+        })
+      }
+    } catch {
+      case e: Throwable => log.error("Erro no path: "+e.getMessage)
+    }
+
+    
+  }
+
+  def setupConnection(username: String, password: String, host: String, port: String): ChannelSftp = {
+    val jsch = new JSch()
+    var sftp = new ChannelSftp()
+    val jschSession = jsch.getSession(username,host, port.toInt)
+    jschSession.setPassword(password)
+    val config = new java.util.Properties()
+    config.put("StrictHostKeyChecking", "no")
+    jschSession.setConfig(config)
+    try{
+      jschSession.connect()
+      if(jschSession.isConnected()){
+        sftp = (jschSession.openChannel("sftp")).asInstanceOf[ChannelSftp]
+        sftp.connect()
+        log.info("Conexão ao servidor SFTP com sucesso")
+      }
+    } catch{
+      case e: Throwable => 
+      log.error(("Erro ao tentar conectar com o servidor SFTP"))
+    }
+    return sftp
+  }
+}
+
+mar 27, 2021 10:37:40 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 1668
+[0m2021.03.27 22:38:33 WARN  no build target for: /home/hdp/Documents/sftpclient/src/main/scala/com/telefonica/SingletonSftp.scala[0m
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+
+  val username = "gabi"
+  val password = "123"
+  val host = "127.0.0.1"
+  val port = "22"
+  val path = "/home/gabi/ftp"
+
+  def listarArquivos(username: String, password: String, host: String, port: String, path: String){
+    
+    val sftp = setupConnection(username, password, host, port)
+
+    try{
+      if(sftp.isConnected()){
+    	  val files = sftp.ls(path)
+			  var dir = new ArrayList[String]
+    	  files.map(c => if(!c.toString().endsWith(".") && !c.toString().endsWith("..")){
+          if(!c.getAttrs.isDir){
+            dir.add(path+entry.getFilename)
+          } else if(c.getAttrs.isDir){
+            listarArquivos(username, password, host, port, path+entry.getFilename+"/")
+          }
+        })
+      }
+    } catch {
+      case e: Throwable => log.error("Erro no path: "+e.getMessage)
+    }
+
+    
+  }
+
+  def setupConnection(username: String, password: String, host: String, port: String): ChannelSftp = {
+    val jsch = new JSch()
+    var sftp = new ChannelSftp()
+    val jschSession = jsch.getSession(username,host, port.toInt)
+    jschSession.setPassword(password)
+    val config = new java.util.Properties()
+    config.put("StrictHostKeyChecking", "no")
+    jschSession.setConfig(config)
+    try{
+      jschSession.connect()
+      if(jschSession.isConnected()){
+        sftp = (jschSession.openChannel("sftp")).asInstanceOf[ChannelSftp]
+        sftp.connect()
+        log.info("Conexão ao servidor SFTP com sucesso")
+      }
+    } catch{
+      case e: Throwable => 
+      log.error(("Erro ao tentar conectar com o servidor SFTP"))
+    }
+    return sftp
+  }
+}
+
+[0m2021.03.27 22:39:13 WARN  no build target for: /home/hdp/Documents/sftpclient/src/main/scala/com/telefonica/SingletonSftp.scala[0m
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+
+  val username = "gabi"
+  val password = "123"
+  val host = "127.0.0.1"
+  val port = "22"
+  val path = "/home/gabi/ftp"
+  listarArquivos(username, password, host, port, path)
+
+  def listarArquivos(username: String, password: String, host: String, port: String, path: String){
+    
+    val sftp = setupConnection(username, password, host, port)
+
+    try{
+      if(sftp.isConnected()){
+    	  val files = sftp.ls(path)
+			  var dir = new ArrayList[String]
+    	  files.map(c => if(!c.toString().endsWith(".") && !c.toString().endsWith("..")){
+          if(!c.getAttrs.isDir){
+            dir.add(path+entry.getFilename)
+          } else if(c.getAttrs.isDir){
+            listarArquivos(username, password, host, port, path+entry.getFilename+"/")
+          }
+        })
+      }
+    } catch {
+      case e: Throwable => log.error("Erro no path: "+e.getMessage)
+    }
+
+    
+  }
+
+  def setupConnection(username: String, password: String, host: String, port: String): ChannelSftp = {
+    val jsch = new JSch()
+    var sftp = new ChannelSftp()
+    val jschSession = jsch.getSession(username,host, port.toInt)
+    jschSession.setPassword(password)
+    val config = new java.util.Properties()
+    config.put("StrictHostKeyChecking", "no")
+    jschSession.setConfig(config)
+    try{
+      jschSession.connect()
+      if(jschSession.isConnected()){
+        sftp = (jschSession.openChannel("sftp")).asInstanceOf[ChannelSftp]
+        sftp.connect()
+        log.info("Conexão ao servidor SFTP com sucesso")
+      }
+    } catch{
+      case e: Throwable => 
+      log.error(("Erro ao tentar conectar com o servidor SFTP"))
+    }
+    return sftp
+  }
+}
+
+[0m2021.03.27 22:39:53 WARN  no build target for: /home/hdp/Documents/sftpclient/src/main/scala/com/telefonica/SingletonSftp.scala[0m
+package com.telefonica
+
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.ChannelSftp
+import java.util.ArrayList
+import java.io.File
+import org.apache.log4j.Logger
+
+object SingletonSftp {
+
+  val username = "gabi"
+  val password = "123"
+  val host = "127.0.0.1"
+  val port = "22"
+  val path = "/home/gabi/ftp"
+  listarArquivos(username, password, host, port, path)
+
+  def listarArquivos(username: String, password: String, host: String, port: String, path: String){
+    
+    val sftp = setupConnection(username, password, host, port)
+
+    try{
+      if(sftp.isConnected()){
+    	  val files = sftp.ls(path)
+			  var dir = new ArrayList[String]
+    	  files.map(c => if(!c.toString().endsWith(".") && !c.toString().endsWith("..")){
+          if(!c.getAttrs.isDir){
+            dir.add(path+entry.getFilename)
+          } else if(c.getAttrs.isDir){
+            listarArquivos(username, password, host, port, path+entry.getFilename+"/")
+          }
+        })
+        log.info("Lista de arquivos obtidos com sucesso")
+    	  dir.forEach(println)
+      }
+    } catch {
+      case e: Throwable => log.error("Erro no path: "+e.getMessage)
+    }
+
+    
+  }
+
+  def setupConnection(username: String, password: String, host: String, port: String): ChannelSftp = {
+    val jsch = new JSch()
+    var sftp = new ChannelSftp()
+    val jschSession = jsch.getSession(username,host, port.toInt)
+    jschSession.setPassword(password)
+    val config = new java.util.Properties()
+    config.put("StrictHostKeyChecking", "no")
+    jschSession.setConfig(config)
+    try{
+      jschSession.connect()
+      if(jschSession.isConnected()){
+        sftp = (jschSession.openChannel("sftp")).asInstanceOf[ChannelSftp]
+        sftp.connect()
+        log.info("Conexão ao servidor SFTP com sucesso")
+      }
+    } catch{
+      case e: Throwable => 
+      log.error(("Erro ao tentar conectar com o servidor SFTP"))
+    }
+    return sftp
+  }
+}
+
+[0m2021.03.27 22:40:14 WARN  no build target for: /home/hdp/Documents/sftpclient/src/main/scala/com/telefonica/SingletonSftp.scala[0m
+[0m2021.03.27 22:40:20 INFO  shutting down Metals[0m

@@ -32,17 +32,16 @@ class FileTransfer extends Serializable {
         	  files.foreach(hdfsFile => {
         		  if (hdfsFile.getPath.getName.endsWith(".csv")) {
         			  log.info(s"Realizando o download do arquivo do HDFS: ${hdfsFile.getPath} para o diretorio local: ${local.getAbsolutePath}")
-//        		      println("Realizando o download do arquivo do HDFS: ${hdfsFile.getPath} para o diretorio local: ${local.getAbsolutePath}")
         			  if (!local.isDirectory) {
         				  local.mkdir()
         			  }
         			  fileSystem.copyToLocalFile(false, hdfsFile.getPath, new Path(localDirectory))
+        			  //fileSystem.copyToLocalFile(delSrc, src, dst)
 
         			  val localFile = new File(localDirectory + "/" + hdfsFile.getPath.getName)
         			  if (localFile.isFile) {
         				  channel.put(localDirectory + "/" + hdfsFile.getPath.getName, targetDirectory)
         				  log.info(s"Removendo o arquivo local: ${localFile.getAbsolutePath}")
-//        				  println("Removendo o arquivo local: ${localFile.getAbsolutePath}")
         				  localFile.delete()
         			  }
         		  }
@@ -57,13 +56,11 @@ class FileTransfer extends Serializable {
       case e: Throwable =>
       e.printStackTrace()
       log.error("Erro ao tentar enviar os arquivos para o sftp: " + e.getMessage)
-//      println("Erro ao tentar enviar os arquivos para o sftp: " + e.getMessage)
       }
   }
 
   def clear(hadoopConf: Configuration, hdfs: String, unix: String): Unit = {
 		  log.info("Realizando a limpeza dos diretorios criados pelo processo!")
-//		  println("Realizando a limpeza dos diretorios criados pelo processo!")
 		  FileSystem
 		  .get(hadoopConf)
 		  .delete(new Path(hdfs), true)
@@ -76,7 +73,6 @@ class FileTransfer extends Serializable {
 		  .delete()
 		  
 		  log.info("Diretorios temporários removidos")
-//		  println("Diretorios temporários removidos")
   }
 
   def createRemoteDirectory(channel: ChannelSftp, directory: String): Unit = {
@@ -86,7 +82,6 @@ class FileTransfer extends Serializable {
 		  if (folder.length > 0) {
 			  try {
           log.info("Current Dir : " + channel.pwd)
-//                println("Current Dir : " + channel.pwd)
 				  channel.cd(folder)
 			  } catch {
 			  case e: SftpException =>
